@@ -24,6 +24,7 @@
 #   ./symmetric_difference.exs -t : red:yellow:green red:green:blue
 #   ./symmetric_difference.exs -s '1, 3, 5, 7, 9' '2, 3, 5, 7'
 #   ./symmetric_difference.exs -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'
+#   ./symmetric_difference.exs -s -o '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'
 #   ./symmetric_difference.exs -b
 #   ./symmetric_difference.exs -b -x 5000000 -c 100
 
@@ -68,6 +69,7 @@ defmodule Script do
       token: ",",
       character: false,
       strip: false,
+      original: false,
       benchmark: false,
       max: 1000000,
       count: 12,
@@ -77,6 +79,7 @@ defmodule Script do
       token: :string,
       character: :boolean,
       strip: :boolean,
+      original: :boolean,
       benchmark: :boolean,
       max: :integer,
       count: :integer,
@@ -86,6 +89,7 @@ defmodule Script do
       t: :token,
       c: :character,
       s: :strip,
+      o: :original,
       b: :benchmark,
       x: :max,
       n: :count,
@@ -114,6 +118,8 @@ defmodule Script do
     IO.puts("    -c          : operate on sets of characters instead of sets of strings")
     IO.puts("    --strip     : strip leading and trailing whitespace from set items")
     IO.puts("    -s          : strip leading and trailing whitespace from set items")
+    IO.puts("    --original  : use original algorithm (subtract intersection from union) as opposed to faster algorith (union of differences)")
+    IO.puts("    -o          : use original algorithm (subtract intersection from union) as opposed to faster algorith (union of differences)")
     IO.puts("    --benchmark : perform algorithm benchmark")
     IO.puts("    -b          : perform algorithm benchmark")
     IO.puts("    --max       : benchmark range max, default 1000000")
@@ -127,6 +133,7 @@ defmodule Script do
     IO.puts("  symmetric_difference -t : red:yellow:green red:green:blue")
     IO.puts("  symmetric_difference -s '1, 3, 5, 7, 9' '2, 3, 5, 7'")
     IO.puts("  symmetric_difference -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'")
+    IO.puts("  symmetric_difference -s -o '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'")
     IO.puts("  symmetric_difference -b")
     IO.puts("  symmetric_difference -b -x 5000000 -c 100")
   end
@@ -139,12 +146,16 @@ defmodule Script do
     token = pOptions[:token]
     character = pOptions[:character]
     strip = pOptions[:strip]
+    original = pOptions[:original]
     pSetList
     |> Enum.map(&stringToSet(&1, token, character, strip))
-    |> Enum.reduce([], &CustomSet.symmetricDifference_DifferenceUnion/2)
+    |> Enum.reduce([], fn pSetA, pSetB -> symmetricDifference(pSetA, pSetB, original) end)
     |> Enum.sort
     |> Enum.each(&IO.puts/1)
   end
+
+  def symmetricDifference(pSetA, pSetB, true), do: CustomSet.symmetricDifference_IntersectionDifference(pSetA, pSetB)
+  def symmetricDifference(pSetA, pSetB, false), do: CustomSet.symmetricDifference_DifferenceUnion(pSetA, pSetB)
 
   def benchmark(pOptions) do
     range_max = pOptions[:max]
