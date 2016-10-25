@@ -20,7 +20,11 @@
 #   chmod +x symmetric_difference.exs
 #   ./symmetric_difference.exs --help
 # Examples:
-#   ./symmetric_difference.exs
+#   ./symmetric_difference.exs -c a ab abc
+#   ./symmetric_difference.exs -t : red:yellow:green red:green:blue
+#   ./symmetric_difference.exs -s '1, 3, 5, 7, 9' '2, 3, 5, 7'
+#   ./symmetric_difference.exs -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'
+#   ./symmetric_difference.exs -b
 
 defmodule CustomSet do
   def symmetricDifference_IntersectionDifference(pSetA, pSetB) do
@@ -108,11 +112,11 @@ defmodule Script do
     IO.puts("    --help      : display this usage summary")
     IO.puts("    -?          : display this usage summary")
     IO.puts("Examples:")
-    IO.puts("  symmetric_difference")
     IO.puts("  symmetric_difference -c a ab abc")
     IO.puts("  symmetric_difference -t : red:yellow:green red:green:blue")
     IO.puts("  symmetric_difference -s '1, 3, 5, 7, 9' '2, 3, 5, 7'")
     IO.puts("  symmetric_difference -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'")
+    IO.puts("  symmetric_difference -b")
   end
 
   def stringToSet(pSet, _pToken, true, _), do: String.to_charlist(pSet) |> Enum.map(&(to_string([&1]))) |> Enum.uniq
