@@ -23,9 +23,9 @@
 #   ./fizz_buzz.exs  -n 0 -x 300 -s 11 -f 5 -b 7 -i
 
 defmodule FizzBuzz do
-  def think(pValue, pOpt) do
-    fizz_multiple = pOpt[:fizz]
-    buzz_multiple = pOpt[:buzz]
+  def think(pValue, pOptions) do
+    fizz_multiple = pOptions[:fizz]
+    buzz_multiple = pOptions[:buzz]
     fizz = 0 == rem(pValue, fizz_multiple)
     buzz = 0 == rem(pValue, buzz_multiple)
     think(pValue, fizz, buzz)
@@ -37,16 +37,16 @@ defmodule FizzBuzz do
 
   def say({_pIndex, pValue}, false), do: IO.puts("#{pValue}")
   def say({pIndex, pValue}, true), do: IO.puts("#{pIndex} -> #{pValue}")
-  def say(pOutput, pOpt), do: say(pOutput, pOpt[:index])
+  def say(pOutput, pOptions), do: say(pOutput, pOptions[:index])
 
-  def count(pOpt) do
-    min = pOpt[:min]
-    max = pOpt[:max]
-    skip = pOpt[:skip]
+  def count(pOptions) do
+    min = pOptions[:min]
+    max = pOptions[:max]
+    skip = pOptions[:skip]
     min..max
     |> Enum.take_every(skip)
-    |> Enum.map(&(think(&1,pOpt)))
-    |> Enum.each(&(say(&1,pOpt)))
+    |> Enum.map(&(think(&1,pOptions)))
+    |> Enum.each(&(say(&1,pOptions)))
   end
 end
 
@@ -118,8 +118,8 @@ defmodule Script do
     IO.puts("  fizz_buzz -n 0 -x 300 -s 11 -f 5 -b 7 -i")
   end
 
-  def process(pOpt) do
-    FizzBuzz.count(pOpt)
+  def process(pOptions) do
+    FizzBuzz.count(pOptions)
   end
 end
 

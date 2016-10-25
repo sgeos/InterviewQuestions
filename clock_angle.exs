@@ -85,22 +85,22 @@ defmodule Format do
     |> Kernel./(@radians_in_circle)
   end
 
-  def angle(pAngle, opt) do
+  def angle(pAngle, pOptions) do
     # [radians: false, degrees: false] -> [radians: true]
     # [radians: true, degrees: true] -> [radians: true]
     # [radians: true, degrees: false] -> [radians: true]
     # [radians: false, degrees: true] -> [radians: false]
-    radians = opt[:radians] or not opt[:degrees]
+    radians = pOptions[:radians] or not pOptions[:degrees]
     if radians do
-      radians(pAngle, opt)
+      radians(pAngle, pOptions)
     else
-      degrees(radiansToDegrees(pAngle), opt)
+      degrees(radiansToDegrees(pAngle), pOptions)
     end
   end
 
-  def radians(pRadians, opt) do
-    precision = opt[:precision]
-    pi = opt[:pi]
+  def radians(pRadians, pOptions) do
+    precision = pOptions[:precision]
+    pi = pOptions[:pi]
     if pi do
       "#{pRadians |> Kernel./(:math.pi) |> round(precision)} PI radians"
     else
@@ -108,8 +108,8 @@ defmodule Format do
     end
   end
 
-  def degrees(pDegrees, opt) do
-    precision = opt[:precision]
+  def degrees(pDegrees, pOptions) do
+    precision = pOptions[:precision]
     "#{pDegrees |> round(precision)} degrees"
   end
 
@@ -134,9 +134,9 @@ defmodule Test do
   def conditionalNormalize(pValue, true), do: ClockAngle.normalize(pValue)
   def conditionalNormalize(pValue, false), do: pValue
 
-  def case(pHour, pMinute, pExpected, opt) do
-    precision = opt[:precision]
-    normalize = opt[:normalize]
+  def case(pHour, pMinute, pExpected, pOptions) do
+    precision = pOptions[:precision]
+    normalize = pOptions[:normalize]
 
     actual = ClockAngle.radians(pHour, pMinute, normalize)
     actual_rounded = actual |> Float.round(precision)
@@ -149,42 +149,42 @@ defmodule Test do
     else
       {"FAIL", "!="}
     end
-    IO.puts("#{result} #{Format.time(pHour, pMinute)} : Actual #{Format.angle(actual, opt)} #{operator} Expected #{Format.angle(expected, opt)}")
+    IO.puts("#{result} #{Format.time(pHour, pMinute)} : Actual #{Format.angle(actual, pOptions)} #{operator} Expected #{Format.angle(expected, pOptions)}")
   end
 
   def minutesForward(pMinutes) do
     pMinutes / @minutes_in_circle * @radians_in_circle
   end
 
-  def all(opt) do
-    case( 3,  0, minutesForward(-15), opt)
-    case( 3,  5, minutesForward(-10), opt)
-    case( 3, 10, minutesForward(-5), opt)
-    case( 3, 15, minutesForward(0), opt)
-    case( 3, 20, minutesForward(5), opt)
-    case( 3, 25, minutesForward(10), opt)
-    case( 3, 30, minutesForward(15), opt)
-    case( 3, 35, minutesForward(20), opt)
-    case( 3, 40, minutesForward(25), opt)
-    case( 3, 45, minutesForward(30), opt)
-    case( 3, 50, minutesForward(35), opt)
-    case( 3, 55, minutesForward(40), opt)
-    case( 3, 60, minutesForward(45), opt)
-    case( 0, 37, minutesForward(37), opt)
-    case( 1, 37, minutesForward(32), opt)
-    case( 2, 37, minutesForward(27), opt)
-    case( 3, 37, minutesForward(22), opt)
-    case( 4, 37, minutesForward(17), opt)
-    case( 5, 37, minutesForward(12), opt)
-    case( 6, 37, minutesForward(7), opt)
-    case( 7, 37, minutesForward(2), opt)
-    case( 8, 37, minutesForward(-3), opt)
-    case( 9, 37, minutesForward(-8), opt)
-    case(10, 37, minutesForward(-13), opt)
-    case(11, 37, minutesForward(-18), opt)
-    case(12, 37, minutesForward(-23), opt)
-    case(24, 11, minutesForward(-109), opt)
-    case(-2, 99, minutesForward(109), opt)
+  def all(pOptions) do
+    case( 3,  0, minutesForward(-15), pOptions)
+    case( 3,  5, minutesForward(-10), pOptions)
+    case( 3, 10, minutesForward(-5), pOptions)
+    case( 3, 15, minutesForward(0), pOptions)
+    case( 3, 20, minutesForward(5), pOptions)
+    case( 3, 25, minutesForward(10), pOptions)
+    case( 3, 30, minutesForward(15), pOptions)
+    case( 3, 35, minutesForward(20), pOptions)
+    case( 3, 40, minutesForward(25), pOptions)
+    case( 3, 45, minutesForward(30), pOptions)
+    case( 3, 50, minutesForward(35), pOptions)
+    case( 3, 55, minutesForward(40), pOptions)
+    case( 3, 60, minutesForward(45), pOptions)
+    case( 0, 37, minutesForward(37), pOptions)
+    case( 1, 37, minutesForward(32), pOptions)
+    case( 2, 37, minutesForward(27), pOptions)
+    case( 3, 37, minutesForward(22), pOptions)
+    case( 4, 37, minutesForward(17), pOptions)
+    case( 5, 37, minutesForward(12), pOptions)
+    case( 6, 37, minutesForward(7), pOptions)
+    case( 7, 37, minutesForward(2), pOptions)
+    case( 8, 37, minutesForward(-3), pOptions)
+    case( 9, 37, minutesForward(-8), pOptions)
+    case(10, 37, minutesForward(-13), pOptions)
+    case(11, 37, minutesForward(-18), pOptions)
+    case(12, 37, minutesForward(-23), pOptions)
+    case(24, 11, minutesForward(-109), pOptions)
+    case(-2, 99, minutesForward(109), pOptions)
   end
 end
 
@@ -271,12 +271,12 @@ defmodule Script do
     IO.puts("  clock_angle -t -d -n -p 0")
   end
 
-  def process(opt) do
-    hour = opt[:hour]
-    minute = opt[:minute]
-    normalize = opt[:normalize]
+  def process(pOptions) do
+    hour = pOptions[:hour]
+    minute = pOptions[:minute]
+    normalize = pOptions[:normalize]
     angle = ClockAngle.radians(hour, minute, normalize)
-    output(Format.time(hour, minute), Format.angle(angle, opt))
+    output(Format.time(hour, minute), Format.angle(angle, pOptions))
   end
 
   def output(pTime, pAngle) do
