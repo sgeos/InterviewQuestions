@@ -25,6 +25,7 @@
 #   ./symmetric_difference.exs -s '1, 3, 5, 7, 9' '2, 3, 5, 7'
 #   ./symmetric_difference.exs -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'
 #   ./symmetric_difference.exs -b
+#   ./symmetric_difference.exs -b -x 5000000 -c 100
 
 defmodule CustomSet do
   def symmetricDifference_IntersectionDifference(pSetA, pSetB) do
@@ -68,6 +69,8 @@ defmodule Script do
       character: false,
       strip: false,
       benchmark: false,
+      max: 1000000,
+      count: 12,
       help: false,
     ]
     switches = [
@@ -75,6 +78,8 @@ defmodule Script do
       character: :boolean,
       strip: :boolean,
       benchmark: :boolean,
+      max: :integer,
+      count: :integer,
       help: :boolean,
     ]
     aliases = [
@@ -82,6 +87,8 @@ defmodule Script do
       c: :character,
       s: :strip,
       b: :benchmark,
+      x: :max,
+      n: :count,
       "?": :help,
     ]
     {parsed, remaining, invalid} = OptionParser.parse(args, strict: switches, aliases: aliases)
@@ -91,7 +98,7 @@ defmodule Script do
       options[:help] or (0 < length invalid) ->
         usage
       options[:benchmark] ->
-        benchmark
+        benchmark(options)
       true ->
         process(remaining, options)
     end
@@ -109,6 +116,10 @@ defmodule Script do
     IO.puts("    -s          : strip leading and trailing whitespace from set items")
     IO.puts("    --benchmark : perform algorithm benchmark")
     IO.puts("    -b          : perform algorithm benchmark")
+    IO.puts("    --max       : benchmark range max, default 1000000")
+    IO.puts("    -x          : benchmark range max, default 1000000")
+    IO.puts("    --count     : benchmark set count, default 12")
+    IO.puts("    -n          : benchmark set count, default 12")
     IO.puts("    --help      : display this usage summary")
     IO.puts("    -?          : display this usage summary")
     IO.puts("Examples:")
@@ -117,6 +128,7 @@ defmodule Script do
     IO.puts("  symmetric_difference -s '1, 3, 5, 7, 9' '2, 3, 5, 7'")
     IO.puts("  symmetric_difference -s '1, 2, 3, 5, 8' '1, 4, 9' '2, 4, 8' '1, 3, 5, 7, 9' '2, 3, 5, 7'")
     IO.puts("  symmetric_difference -b")
+    IO.puts("  symmetric_difference -b -x 5000000 -c 100")
   end
 
   def stringToSet(pSet, _pToken, true, _), do: String.to_charlist(pSet) |> Enum.map(&(to_string([&1]))) |> Enum.uniq
@@ -134,9 +146,9 @@ defmodule Script do
     |> Enum.each(&IO.puts/1)
   end
 
-  def benchmark() do
-    range_max = 1000000
-    input_max = 12
+  def benchmark(pOptions) do
+    range_max = pOptions[:max]
+    input_max = pOptions[:count]
     range = 0..range_max
     input = 1..input_max
     |> Enum.map(&(range |> Enum.take_every(&1)))
