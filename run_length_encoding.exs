@@ -9,15 +9,15 @@
 # A single file solution written in Elixir follows.
 # This solution also includes a routine to run length decode strings.
 # To see a list of the command line arguments, run the following.
-#   chmod +x rle.exs
-#   ./rle.exs --help
+#   chmod +x run_length_encoding.exs
+#   ./run_length_encoding.exs --help
 # Examples:
-#   ./rle.exs abbbccddddddefff
-#   ./rle.exs -s abbbccddddddefff
-#   ./rle.exs -d a1b3c2d6e1f3
-#   ./rle.exs -d ab3c2d6ef3
+#   ./run_length_encoding.exs abbbccddddddefff
+#   ./run_length_encoding.exs -s abbbccddddddefff
+#   ./run_length_encoding.exs -d a1b3c2d6e1f3
+#   ./run_length_encoding.exs -d ab3c2d6ef3
 
-defmodule RLE do
+defmodule RunLengthEncoding do
   defp encoder(pItem, {pItem, pCount, pOutput}), do: {pItem, pCount + 1, pOutput}
   defp encoder(pNewItem, {pItem, pCount, pOutput}), do: {pNewItem, 1, finishEncodingItem({pItem, pCount, pOutput})}
   defp finishEncodingItem({nil, _pCount, pOutput}), do: pOutput
@@ -96,7 +96,7 @@ defmodule Script do
   def usage() do
     IO.puts("Run length encode (or decode) input strings.")
     IO.puts("Usage:")
-    IO.puts("  rle [--decode] STRING_A [STRING_B ...]")
+    IO.puts("  run_length_encoding [--decode] STRING_A [STRING_B ...]")
     IO.puts("    --short  : do not encode 1 after run length 1 items")
     IO.puts("    -s       : do not encode 1 after run length 1 items")
     IO.puts("    --decode : decode strings instead of encoding them")
@@ -104,10 +104,10 @@ defmodule Script do
     IO.puts("    --help   : display this usage summary")
     IO.puts("    -?       : display this usage summary")
     IO.puts("Examples:")
-    IO.puts("  rle abbbccddddddefff")
-    IO.puts("  rle -s abbbccddddddefff")
-    IO.puts("  rle -d a1b3c2d6e1f3")
-    IO.puts("  rle -d ab3c2d6ef3")
+    IO.puts("  run_length_encoding abbbccddddddefff")
+    IO.puts("  run_length_encoding -s abbbccddddddefff")
+    IO.puts("  run_length_encoding -d a1b3c2d6e1f3")
+    IO.puts("  run_length_encoding -d ab3c2d6ef3")
   end
 
   def process(pSetList, pOptions) do
@@ -118,8 +118,8 @@ defmodule Script do
     |> Enum.each(&IO.puts/1)
   end
 
-  def encodeString(pInputString, false, pShort), do: RLE.encodeString(pInputString, pShort)
-  def encodeString(pInputString, true, _pShort), do: RLE.decodeString(pInputString)
+  def encodeString(pInputString, false, pShort), do: RunLengthEncoding.encodeString(pInputString, pShort)
+  def encodeString(pInputString, true, _pShort), do: RunLengthEncoding.decodeString(pInputString)
 end
 
 Script.main(System.argv)
