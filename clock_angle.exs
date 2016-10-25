@@ -20,7 +20,7 @@
 # Trigonometric functions are periodic, so there are an infinite number of solutions if measuring position.
 # When measuring movement in degrees, the number of revolutions has meaning.
 
-# A single file solution written in elixir follows.
+# A single file solution written in Elixir follows.
 # To see a list of the command line arguments, run the following.
 # Note that formatting flags affect the test data.
 #   chmod +x clock_angle.exs
