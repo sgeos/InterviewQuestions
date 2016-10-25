@@ -271,7 +271,7 @@ defmodule Script do
     IO.puts("  clock_angle -t -d -n -p 0")
   end
 
-  def process(opt \\ []) do
+  def process(opt) do
     hour = opt[:hour]
     minute = opt[:minute]
     normalize = opt[:normalize]
