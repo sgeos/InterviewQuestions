@@ -17,28 +17,28 @@ Instructions for installing Elixir can be found [here][elixir-install].
 
 Clone this repository.
 
-{% highlight sh %}
+```sh
 git clone git@github.com:sgeos/InterviewQuestions.git
 mv InterviewQuestions interview_questions
 cd interview_questions
-{% endhighlight %}
+```
 
 If **env** is located at **/usr/bin/env**, then the programs can be executed.
 
-{% highlight sh %}
+```sh
 chmod +x *.exs
 ./fizz_buzz.exs -s 2 -F Big... -B Scary... -W Monsters!
-{% endhighlight %}
+```
 
 Otherwise **elixir** can be used to run them.
 
-{% highlight sh %}
+```sh
 elixir fizz_buzz.exs -s 2 -F Big... -B Scary... -W Monsters!
-{% endhighlight %}
+```
 
 # Software Versions
 
-{% highlight sh %}
+```sh
  date -u "+%Y-%m-%d %H:%M:%S +0000"
 2016-11-02 02:15:04 +0000
 $ uname -vm
@@ -47,7 +47,7 @@ $ mix hex.info
 Hex:    0.13.0
 Elixir: 1.3.4
 OTP:    19.1.5
-{% endhighlight %}
+```
 
 # Links
 
