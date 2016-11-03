@@ -51,8 +51,8 @@ OTP:    19.1.5
 
 # Links
 
-[Elixir, Home Page][elixir-home]
-[Elixir, Installing Elixir][elixir-install]
+- [Elixir, Home Page][elixir-home]
+- [Elixir, Installing Elixir][elixir-install]
 
 [elixir-home]: http://elixir-lang.org
 [elixir-install]: http://elixir-lang.org/install.html
