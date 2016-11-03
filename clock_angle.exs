@@ -5,22 +5,27 @@
 # Also create some test data.
 # Use any language you like.
 # The C++ function signature follows.
+#   // hours: 0 to 23
+#   // minutes: 0 to 59
+#   // output: 0 to 180 degrees, -1 error on invalid input
 #   uint32_t ClockAngle(uint32_t hours, uint32_t minutes)
 
 # MY NOTES:
-# A solution in degrees seems to be implied by unt32_t.
 # The simple solution is:
 #   return (30 * hours) - (6 * minutes);
-# The direction of the measurement is not defined.
-# A range of acceptable return values, like [0, 360) is not defined.
+# The less simple solution is:
+#   return (30 * hours + minutes / 2) - (6 * minutes);
 
 # OTHER THOUGHTS:
 # The problem itself is so simple someone bad at trigonometry should be able to solve it.
 # Trigonometry problems should generally be solved in radians.
 # Trigonometric functions are periodic, so there are an infinite number of solutions if measuring position.
 # When measuring movement in degrees, the number of revolutions has meaning.
+# -1 moonlights as an error code in C++, but atoms are a better choice in Elixir.
 
 # A single file solution written in Elixir follows.
+# Run with the following flags for the above spec.
+#   ./clock_angle.exs -a -b -+ -n -h HOURS -m MINUTES
 # To see a list of the command line arguments, run the following.
 # Note that formatting flags affect the test data.
 #   chmod +x clock_angle.exs
@@ -30,12 +35,19 @@
 #   ./clock_angle.exs -h 8 -m 10 -r --no-pi -p 4
 #   ./clock_angle.exs -h 8 -m 10 -r --no-pi -p 4 -n
 #   ./clock_angle.exs -h 2 -m 37 -d -p 0
+#   ./clock_angle.exs -h 24 -m 44
+#   ./clock_angle.exs -h 24 -m 44 -a
+#   ./clock_angle.exs -h 24 -m 44 -n
+#   ./clock_angle.exs -h 24 -m 44 -+
+#   ./clock_angle.exs -h 24 -m 44 -n -+
+#   ./clock_angle.exs -h 24 -m 44 -b
 #   ./clock_angle.exs -t -p 2
-#   ./clock_angle.exs -t -d -n -p 0
+#   ./clock_angle.exs -t -d -p 0 -a -n -+ -b
 
 defmodule ClockAngle do
-  @hour_max 12
-  @minute_max 60  
+  @hours_in_day 24
+  @hours_in_circle 12
+  @minutes_in_circle 60  
   @radians_in_circle 2*:math.pi
 
   def integerToRadians(pValue, pMax) do
@@ -45,33 +57,85 @@ defmodule ClockAngle do
   end
 
   def hourToRadians(pHour) do
-    integerToRadians(pHour, @hour_max)
+    integerToRadians(pHour, @hours_in_circle)
+  end
+
+  def adjustHourInRadians(pMinute) do
+    pMinute
+    |> Kernel./(@minutes_in_circle)
+    |> Kernel.*(@radians_in_circle)
+    |> Kernel./(@hours_in_circle)
   end
 
   def minuteToRadians(pMinute) do
-    integerToRadians(pMinute, @minute_max)
+    integerToRadians(pMinute, @minutes_in_circle)
   end
 
-  def normalize(pValue) when pValue < 0 or @radians_in_circle <= pValue do
+  def normalize(pValue) when
+    pValue < 0 or @radians_in_circle <= pValue
+  do
     pValue
-    |> Kernel./(@radians_in_circle)
-    |> Float.floor
-    |> Kernel.*(-@radians_in_circle)
-    |> Kernel.+(pValue)
+    |> Kernel./(@radians_in_circle) # number of revolutions
+    |> Float.floor # number of complete revolutions
+    |> Kernel.*(-@radians_in_circle) # excess complete revolutions
+    |> Kernel.+(pValue) # partial revolution remains
   end
 
   def normalize(pValue) do
     pValue
   end
 
-  def radians(pHour, pMinute, pNormalize \\ false)
-  def radians(pHour, pMinute, false) do
+  def normalize_difference(pValue) when
+    pValue < 0 or @radians_in_circle <= pValue
+  do
+    pValue
+    |> normalize
+    |> normalize_difference
+  end
+
+  def normalize_difference(pValue) when
+    @radians_in_circle / 2 <= pValue
+  do
+    @radians_in_circle - pValue
+  end
+
+  def normalize_difference(pValue), do: pValue
+
+  def radians(pHour, pMinute, pAdjustHour \\ false, pNormalize \\ false, pPositiveResult \\ false, pCheckBounds \\ false)
+
+  def radians(pHour, pMinute, _pAdjustHour, _pNormalize, _pPositiveResult, true) when
+    pHour < 0 or @hours_in_day <= pHour or
+    pMinute < 0 or @minutes_in_circle <= pMinute
+  do
+    :error
+  end
+
+  # do not adjust hour hand
+  def radians(pHour, pMinute, false, false, false, _pCheckBounds) do
     minuteToRadians(pMinute) - hourToRadians(pHour)
   end
 
-  def radians(pHour, pMinute, true) do
-    radians(pHour, pMinute, false)
+  # adjust hour hand
+  def radians(pHour, pMinute, true, false, false, _pCheckBounds) do
+    minuteToRadians(pMinute) - hourToRadians(pHour) - adjustHourInRadians(pMinute)
+  end
+
+  # normalize result
+  def radians(pHour, pMinute, pAdjustHour, true, false, pCheckBounds) do
+    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
     |> normalize
+  end
+
+  # positive result
+  def radians(pHour, pMinute, pAdjustHour, false, true, pCheckBounds) do
+    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
+    |> Kernel.abs
+  end
+
+  # normalize positive result
+  def radians(pHour, pMinute, pAdjustHour, true, true, pCheckBounds) do
+    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
+    |> normalize_difference
   end
 end
 
@@ -84,6 +148,8 @@ defmodule Format do
     |> Kernel.*(@degrees_in_circle)
     |> Kernel./(@radians_in_circle)
   end
+
+  def angle(:error, _pOptions), do: "ERROR"
 
   def angle(pAngle, pOptions) do
     # [radians: false, degrees: false] -> [radians: true]
@@ -128,21 +194,33 @@ defmodule Format do
 end
 
 defmodule Test do
+  @hours_in_day 24
   @minutes_in_circle 60
   @radians_in_circle 2*:math.pi
 
-  def conditionalNormalize(pValue, true), do: ClockAngle.normalize(pValue)
-  def conditionalNormalize(pValue, false), do: pValue
+  def conditionalNormalize(pValue, true, true), do: ClockAngle.normalize_difference(pValue)
+  def conditionalNormalize(pValue, true, false), do: ClockAngle.normalize(pValue)
+  def conditionalNormalize(pValue, false, true), do: abs(pValue)
+  def conditionalNormalize(pValue, false, false), do: pValue
+
+  def round(pValue, _pPrecision) when is_atom(pValue), do: pValue
+  def round(pValue, pPrecision), do: pValue |> Float.round(pPrecision)
 
   def case(pHour, pMinute, pExpected, pOptions) do
-    precision = pOptions[:precision]
+    adjust = pOptions[:adjust]
     normalize = pOptions[:normalize]
+    positive = pOptions[:positive]
+    bounds = pOptions[:bounds]
+    precision = pOptions[:precision]
 
-    actual = ClockAngle.radians(pHour, pMinute, normalize)
-    actual_rounded = actual |> Float.round(precision)
+    actual = ClockAngle.radians(pHour, pMinute, adjust, normalize, positive, bounds)
+    actual_rounded = actual |> round(precision)
 
-    expected = pExpected |> conditionalNormalize(normalize)
-    expected_rounded = expected |> Float.round(precision)
+    expected = pExpected
+    |> conditionalAdjustMinutes(pMinute, adjust)
+    |> conditionalNormalize(normalize, positive)
+    |> conditionalBounds(pHour, pMinute, bounds)
+    expected_rounded = expected |> round(precision)
 
     {result, operator} = if actual_rounded == expected_rounded do
       {"PASS", "=="}
@@ -152,9 +230,24 @@ defmodule Test do
     IO.puts("#{result} #{Format.time(pHour, pMinute)} : Actual #{Format.angle(actual, pOptions)} #{operator} Expected #{Format.angle(expected, pOptions)}")
   end
 
-  def minutesForward(pMinutes) do
-    pMinutes / @minutes_in_circle * @radians_in_circle
+  def minutesForward(pMinute) do
+    pMinute / @minutes_in_circle * @radians_in_circle
   end
+
+  def conditionalAdjustMinutes(pInitialValue, _pMinute, false), do: pInitialValue
+
+  def conditionalAdjustMinutes(pInitialValue, pMinute, true) do
+    pInitialValue - ClockAngle.adjustHourInRadians(pMinute)
+  end
+
+  def conditionalBounds(_pValue, pHour, pMinute, true) when
+    pHour < 0 or @hours_in_day <= pHour or
+    pMinute < 0 or @minutes_in_circle <= pMinute
+  do
+    :error
+  end
+
+  def conditionalBounds(pValue, _pHour, _pMinute, _bounds), do: pValue
 
   def all(pOptions) do
     case( 3,  0, minutesForward(-15), pOptions)
@@ -183,8 +276,27 @@ defmodule Test do
     case(10, 37, minutesForward(-13), pOptions)
     case(11, 37, minutesForward(-18), pOptions)
     case(12, 37, minutesForward(-23), pOptions)
+    case(13, 37, minutesForward(-28), pOptions)
+    case(14, 37, minutesForward(-33), pOptions)
+    case(15, 37, minutesForward(-38), pOptions)
+    case(16, 37, minutesForward(-43), pOptions)
+    case(17, 37, minutesForward(-48), pOptions)
+    case(18, 37, minutesForward(-53), pOptions)
+    case(19, 37, minutesForward(-58), pOptions)
+    case(20, 37, minutesForward(-63), pOptions)
+    case(21, 37, minutesForward(-68), pOptions)
+    case(22, 37, minutesForward(-73), pOptions)
+    case(23, 37, minutesForward(-78), pOptions)
     case(24, 11, minutesForward(-109), pOptions)
     case(-2, 99, minutesForward(109), pOptions)
+    case(-1, -1, minutesForward(4), pOptions)
+    case(-1,  0, minutesForward(5), pOptions)
+    case( 0, -1, minutesForward(-1), pOptions)
+    case( 0,  0, minutesForward(0), pOptions)
+    case(23, 59, minutesForward(-56), pOptions)
+    case(23, 60, minutesForward(-55), pOptions)
+    case(24, 59, minutesForward(-61), pOptions)
+    case(24, 60, minutesForward(-60), pOptions)
   end
 end
 
@@ -194,7 +306,10 @@ defmodule Script do
       hour: 0,
       minute: 0,
       precision: 3,
+      adjust: false,
       normalize: false,
+      positive: false,
+      bounds: false,
       radians: false,
       degrees: false,
       pi: true,
@@ -205,7 +320,10 @@ defmodule Script do
       hour: :integer,
       minute: :integer,
       precision: :integer,
+      adjust: :boolean,
       normalize: :boolean,
+      positive: :boolean,
+      bounds: :boolean,
       radians: :boolean,
       degrees: :boolean,
       pi: :boolean,
@@ -216,7 +334,10 @@ defmodule Script do
       h: :hour,
       m: :minute,
       p: :precision,
+      a: :adjust,
       n: :normalize,
+      "+": :positive,
+      b: :bounds,
       r: :radians,
       d: :degrees,
       t: :test,
@@ -256,8 +377,15 @@ defmodule Script do
     IO.puts("    --pi               : display radians as a multiple of PI, default")
     IO.puts("    -P                 : display radians as a multiple of PI, default")
     IO.puts("    --no-pi            : do not display radians as a multiple of PI")
+    IO.puts("    --adjust           : adjust hour hand as minute hand moves")
+    IO.puts("    -a                 : adjust hour hand as minute hand moves")
     IO.puts("    --normalize        : clamp result to [0, 2.0 PI) radians or [0, 360) degrees")
     IO.puts("    -n                 : clamp result to [0, 2.0 PI) radians or [0, 360) degrees")
+    IO.puts("    --positive         : result is positive difference between clock hands")
+    IO.puts("    -+                 : result is positive difference between clock hands")
+    IO.puts("                       : use --normalize and --positive clamp result to [0, PI) radians or [0, 180) degrees")
+    IO.puts("    --bounds           : error unless 0 <= hours < 24 and 0 <= minutes < 60")
+    IO.puts("    -b                 : error unless 0 <= hours < 24 and 0 <= minutes < 60")
     IO.puts("    --test             : run test cases")
     IO.puts("    -t                 : run test cases")
     IO.puts("    --help             : display this usage summary")
@@ -267,15 +395,24 @@ defmodule Script do
     IO.puts("  clock_angle -h 8 -m 10 -r --no-pi -p 4")
     IO.puts("  clock_angle -h 8 -m 10 -r --no-pi -p 4 -n")
     IO.puts("  clock_angle -h 2 -m 37 -d -p 0")
+    IO.puts("  clock_angle -h 24 -m 44")
+    IO.puts("  clock_angle -h 24 -m 44 -a")
+    IO.puts("  clock_angle -h 24 -m 44 -n")
+    IO.puts("  clock_angle -h 24 -m 44 -+")
+    IO.puts("  clock_angle -h 24 -m 44 -n -+")
+    IO.puts("  clock_angle -h 24 -m 44 -b")
     IO.puts("  clock_angle -t -p 2")
-    IO.puts("  clock_angle -t -d -n -p 0")
+    IO.puts("  clock_angle -t -d -p 0 -a -n -+ -b")
   end
 
   def process(pOptions) do
     hour = pOptions[:hour]
     minute = pOptions[:minute]
+    adjust = pOptions[:adjust]
     normalize = pOptions[:normalize]
-    angle = ClockAngle.radians(hour, minute, normalize)
+    positive = pOptions[:positive]
+    bounds = pOptions[:bounds]
+    angle = ClockAngle.radians(hour, minute, adjust, normalize, positive, bounds)
     output(Format.time(hour, minute), Format.angle(angle, pOptions))
   end
 
