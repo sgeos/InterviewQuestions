@@ -21,13 +21,14 @@
 # Trigonometry problems should generally be solved in radians.
 # Trigonometric functions are periodic, so there are an infinite number of solutions if measuring position.
 # When measuring movement in degrees, the number of revolutions has meaning.
-# -1 moonlights as an error code in C++, but atoms are a better choice in Elixir.
+# -1 moonlights as an error code in C++, but atoms are a better way of expressing errors in Elixir.
 
 # A single file solution written in Elixir follows.
-# Run with the following flags for the above spec.
+# Note that flags affect the test data computations and output.
+# Run with the following flags to match the C++ spec.
 #   ./clock_angle.exs -a -b -+ -n -h HOURS -m MINUTES
+#
 # To see a list of the command line arguments, run the following.
-# Note that formatting flags affect the test data.
 #   chmod +x clock_angle.exs
 #   ./clock_angle.exs --help
 # Examples:
@@ -62,9 +63,9 @@ defmodule ClockAngle do
 
   def adjustHourInRadians(pMinute) do
     pMinute
-    |> Kernel./(@minutes_in_circle)
-    |> Kernel.*(@radians_in_circle)
-    |> Kernel./(@hours_in_circle)
+    |> Kernel./(@minutes_in_circle) # normalize to a value from [0,1)
+    |> Kernel.*(@radians_in_circle) # fraction of circumference of circle
+    |> Kernel./(@hours_in_circle) # fraction between hour positions
   end
 
   def minuteToRadians(pMinute) do
@@ -101,6 +102,8 @@ defmodule ClockAngle do
 
   def normalize_difference(pValue), do: pValue
 
+  # this has too many flag parameters
+  # it should be refactored to take a single options paramerter
   def radians(pHour, pMinute, pAdjustHour \\ false, pNormalize \\ false, pPositiveResult \\ false, pCheckBounds \\ false)
 
   def radians(pHour, pMinute, _pAdjustHour, _pNormalize, _pPositiveResult, true) when
@@ -132,7 +135,7 @@ defmodule ClockAngle do
     |> Kernel.abs
   end
 
-  # normalize positive result
+  # normalized positive result
   def radians(pHour, pMinute, pAdjustHour, true, true, pCheckBounds) do
     radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
     |> normalize_difference
