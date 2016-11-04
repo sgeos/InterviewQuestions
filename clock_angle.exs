@@ -200,7 +200,9 @@ end
 
 defmodule Test do
   @hours_in_day 24
+  @hour_skip 1
   @minutes_in_circle 60
+  @minute_skip 5
   @radians_in_circle 2*:math.pi
 
   def conditionalNormalize(pValue, true, true), do: ClockAngle.normalize_difference(pValue)
@@ -258,45 +260,15 @@ defmodule Test do
   def conditionalBounds(pValue, _pHour, _pMinute, _bounds), do: pValue
 
   def all(pOptions) do
-    case( 3,  0, minutesForward(-15), pOptions)
-    case( 3,  5, minutesForward(-10), pOptions)
-    case( 3, 10, minutesForward(-5), pOptions)
-    case( 3, 15, minutesForward(0), pOptions)
-    case( 3, 20, minutesForward(5), pOptions)
-    case( 3, 25, minutesForward(10), pOptions)
-    case( 3, 30, minutesForward(15), pOptions)
-    case( 3, 35, minutesForward(20), pOptions)
-    case( 3, 40, minutesForward(25), pOptions)
-    case( 3, 45, minutesForward(30), pOptions)
-    case( 3, 50, minutesForward(35), pOptions)
-    case( 3, 55, minutesForward(40), pOptions)
-    case( 3, 60, minutesForward(45), pOptions)
-    case( 0, 37, minutesForward(37), pOptions)
-    case( 1, 37, minutesForward(32), pOptions)
-    case( 2, 37, minutesForward(27), pOptions)
-    case( 3, 37, minutesForward(22), pOptions)
-    case( 4, 37, minutesForward(17), pOptions)
-    case( 5, 37, minutesForward(12), pOptions)
-    case( 6, 37, minutesForward(7), pOptions)
-    case( 7, 37, minutesForward(2), pOptions)
-    case( 8, 37, minutesForward(-3), pOptions)
-    case( 9, 37, minutesForward(-8), pOptions)
-    case(10, 37, minutesForward(-13), pOptions)
-    case(11, 37, minutesForward(-18), pOptions)
-    case(12, 37, minutesForward(-23), pOptions)
-    case(13, 37, minutesForward(-28), pOptions)
-    case(14, 37, minutesForward(-33), pOptions)
-    case(15, 37, minutesForward(-38), pOptions)
-    case(16, 37, minutesForward(-43), pOptions)
-    case(17, 37, minutesForward(-48), pOptions)
-    case(18, 37, minutesForward(-53), pOptions)
-    case(19, 37, minutesForward(-58), pOptions)
-    case(20, 37, minutesForward(-63), pOptions)
-    case(21, 37, minutesForward(-68), pOptions)
-    case(22, 37, minutesForward(-73), pOptions)
-    case(23, 37, minutesForward(-78), pOptions)
-    case(24, 11, minutesForward(-109), pOptions)
-    case(-2, 99, minutesForward(109), pOptions)
+    # loop through hours
+    -@hour_skip..@hours_in_day
+    |> Enum.take_every(@hour_skip)
+    |> Enum.each( &(case(&1, 37, minutesForward(37 - &1*5), pOptions)) )
+    # loop through minutes
+    -@minute_skip..@minutes_in_circle
+    |> Enum.take_every(@minute_skip)
+    |> Enum.each( &(case(3, &1, minutesForward(&1 - 15), pOptions)) )
+    # bounds test
     case(-1, -1, minutesForward(4), pOptions)
     case(-1,  0, minutesForward(5), pOptions)
     case( 0, -1, minutesForward(-1), pOptions)
@@ -305,6 +277,9 @@ defmodule Test do
     case(23, 60, minutesForward(-55), pOptions)
     case(24, 59, minutesForward(-61), pOptions)
     case(24, 60, minutesForward(-60), pOptions)
+    # out of bounds
+    case(-2, 99, minutesForward(109), pOptions)
+    case(33, -77, minutesForward(-242), pOptions)
   end
 end
 
