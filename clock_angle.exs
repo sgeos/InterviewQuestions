@@ -350,7 +350,7 @@ defmodule Script do
     IO.puts("The caluclation assumes the hour and minute hands point directly at the numbers on the clock.")
     IO.puts("Formatting flags affect test data output.")
     IO.puts("Usage:")
-    IO.puts("  clock_angle --hour HOUR --minute MINUTE [--precision DIGITS] [--radians [--pi]|--degrees] [--normalize] [--test|--help]")
+    IO.puts("  clock_angle --hour HOUR --minute MINUTE [--precision DIGITS] [--radians [--pi|--no-pi]|--degrees] [--adjust] [--normalize] [--positive] [--bounds] [--test|--help]")
     IO.puts("    --hour      HOUR   : clock hour, default 0")
     IO.puts("    -h          HOUR   : clock hour, default 0")
     IO.puts("    --minute    MINUTE : clock minute, default 0")
