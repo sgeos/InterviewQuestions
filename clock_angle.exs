@@ -57,18 +57,19 @@ defmodule ClockAngle do
     |> Kernel.*(@radians_in_circle)
   end
 
-  def hourToRadians(pHour) do
-    integerToRadians(pHour, @hours_in_circle)
-  end
-
-  def adjustHourInRadians(pMinute) do
+  def hourToRadians(%{hour: pHour, minute: pMinute, adjust: true}) do
     pMinute
     |> Kernel./(@minutes_in_circle) # normalize to a value from [0,1)
     |> Kernel.*(@radians_in_circle) # fraction of circumference of circle
     |> Kernel./(@hours_in_circle) # fraction between hour positions
+    |> Kernel.+(hourToRadians(%{hour: pHour})) # add base result
   end
 
-  def minuteToRadians(pMinute) do
+  def hourToRadians(%{hour: pHour}) do
+    integerToRadians(pHour, @hours_in_circle)
+  end
+
+  def minuteToRadians(%{minute: pMinute}) do
     integerToRadians(pMinute, @minutes_in_circle)
   end
 
@@ -134,14 +135,9 @@ defmodule ClockAngle do
     |> Kernel.abs
   end
 
-  # adjust hour hand
-  def radians(%{hour: pHour, minute: pMinute, adjust: true}) do
-    minuteToRadians(pMinute) - hourToRadians(pHour) - adjustHourInRadians(pMinute)
-  end
-
-  # do not adjust hour hand
-  def radians(%{hour: pHour, minute: pMinute}) do
-    minuteToRadians(pMinute) - hourToRadians(pHour)
+  # base result
+  def radians(%{hour: _pHour, minute: _pMinute} = pOptions) do
+    minuteToRadians(pOptions) - hourToRadians(pOptions)
   end
 
   # catch all
@@ -247,7 +243,9 @@ defmodule Test do
   def conditionalAdjustMinutes(pInitialValue, _pMinute, false), do: pInitialValue
 
   def conditionalAdjustMinutes(pInitialValue, pMinute, true) do
-    pInitialValue - ClockAngle.adjustHourInRadians(pMinute)
+    %{minute: -pMinute, hour: 0, adjust: true} # subtract minute adjustment
+    |> ClockAngle.hourToRadians # get adjustment
+    |> Kernel.+(pInitialValue) # apply adjustment
   end
 
   def conditionalBounds(_pValue, pHour, pMinute, true) when
