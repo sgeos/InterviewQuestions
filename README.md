@@ -39,7 +39,7 @@ elixir fizz_buzz.exs -s 2 -F Big... -B Scary... -W Monsters!
 # Software Versions
 
 ```sh
- date -u "+%Y-%m-%d %H:%M:%S +0000"
+$ date -u "+%Y-%m-%d %H:%M:%S +0000"
 2016-11-02 02:15:04 +0000
 $ uname -vm
 FreeBSD 12.0-CURRENT #0 r307959: Thu Oct 27 01:15:33 JST 2016     root@mirage.sennue.com:/usr/obj/usr/src/sys/MIRAGE_KERNEL  amd64
