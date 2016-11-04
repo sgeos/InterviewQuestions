@@ -102,44 +102,50 @@ defmodule ClockAngle do
 
   def normalize_difference(pValue), do: pValue
 
-  # this has too many flag parameters
-  # it should be refactored to take a single options paramerter
-  def radians(pHour, pMinute, pAdjustHour \\ false, pNormalize \\ false, pPositiveResult \\ false, pCheckBounds \\ false)
+  def neuterOptions(pOptions) do
+    pOptions
+    |> Map.merge(%{normalize: false, positive: false})
+  end
 
-  def radians(pHour, pMinute, _pAdjustHour, _pNormalize, _pPositiveResult, true) when
+  def radians(pOptions \\ %{})
+
+  def radians(%{hour: pHour, minute: pMinute, bounds: true}) when
     pHour < 0 or @hours_in_day <= pHour or
     pMinute < 0 or @minutes_in_circle <= pMinute
   do
     :error
   end
 
-  # do not adjust hour hand
-  def radians(pHour, pMinute, false, false, false, _pCheckBounds) do
-    minuteToRadians(pMinute) - hourToRadians(pHour)
-  end
-
-  # adjust hour hand
-  def radians(pHour, pMinute, true, false, false, _pCheckBounds) do
-    minuteToRadians(pMinute) - hourToRadians(pHour) - adjustHourInRadians(pMinute)
+  # normalized positive result
+  def radians(%{normalize: true, positive: true} = pOptions) do
+    radians(pOptions |> neuterOptions)
+    |> normalize_difference
   end
 
   # normalize result
-  def radians(pHour, pMinute, pAdjustHour, true, false, pCheckBounds) do
-    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
+  def radians(%{normalize: true} = pOptions) do
+    radians(pOptions |> neuterOptions)
     |> normalize
   end
 
   # positive result
-  def radians(pHour, pMinute, pAdjustHour, false, true, pCheckBounds) do
-    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
+  def radians(%{positive: true} = pOptions) do
+    radians(pOptions |> neuterOptions)
     |> Kernel.abs
   end
 
-  # normalized positive result
-  def radians(pHour, pMinute, pAdjustHour, true, true, pCheckBounds) do
-    radians(pHour, pMinute, pAdjustHour, false, false, pCheckBounds)
-    |> normalize_difference
+  # adjust hour hand
+  def radians(%{hour: pHour, minute: pMinute, adjust: true}) do
+    minuteToRadians(pMinute) - hourToRadians(pHour) - adjustHourInRadians(pMinute)
   end
+
+  # do not adjust hour hand
+  def radians(%{hour: pHour, minute: pMinute}) do
+    minuteToRadians(pMinute) - hourToRadians(pHour)
+  end
+
+  # catch all
+  def radians(_), do: :error
 end
 
 defmodule Format do
@@ -210,13 +216,14 @@ defmodule Test do
   def round(pValue, pPrecision), do: pValue |> Float.round(pPrecision)
 
   def case(pHour, pMinute, pExpected, pOptions) do
-    adjust = pOptions[:adjust]
-    normalize = pOptions[:normalize]
-    positive = pOptions[:positive]
-    bounds = pOptions[:bounds]
-    precision = pOptions[:precision]
+    options = pOptions |> Map.merge(%{hour: pHour, minute: pMinute})
+    precision = options[:precision]
+    adjust = options[:adjust]
+    normalize = options[:normalize]
+    positive = options[:positive]
+    bounds = options[:bounds]
 
-    actual = ClockAngle.radians(pHour, pMinute, adjust, normalize, positive, bounds)
+    actual = ClockAngle.radians(options)
     actual_rounded = actual |> round(precision)
 
     expected = pExpected
@@ -350,6 +357,7 @@ defmodule Script do
     {parsed, remaining, invalid} = OptionParser.parse(args, strict: switches, aliases: aliases)
     options = defaults
     |> Keyword.merge(parsed)
+    |> Enum.into(%{})
     cond do
       options[:help] or (0 < length remaining) or (0 < length invalid) ->
         usage
@@ -411,12 +419,8 @@ defmodule Script do
   def process(pOptions) do
     hour = pOptions[:hour]
     minute = pOptions[:minute]
-    adjust = pOptions[:adjust]
-    normalize = pOptions[:normalize]
-    positive = pOptions[:positive]
-    bounds = pOptions[:bounds]
-    angle = ClockAngle.radians(hour, minute, adjust, normalize, positive, bounds)
-    output(Format.time(hour, minute), Format.angle(angle, pOptions))
+    radians = ClockAngle.radians(pOptions)
+    output(Format.time(hour, minute), Format.angle(radians, pOptions))
   end
 
   def output(pTime, pAngle) do
