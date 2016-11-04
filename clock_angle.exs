@@ -260,6 +260,9 @@ defmodule Test do
   def conditionalBounds(pValue, _pHour, _pMinute, _bounds), do: pValue
 
   def all(pOptions) do
+    # the testing ranges and skip values could be parameterized,
+    # but this project just needs to be done
+
     # loop through hours
     -@hour_skip..@hours_in_day
     |> Enum.take_every(@hour_skip)
