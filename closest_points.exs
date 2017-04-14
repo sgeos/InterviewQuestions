@@ -13,9 +13,9 @@
 #   The output can be in any order.
 
 # A single file solution written in Elixir follows.
+# This that solution also supports working with N-dimensional points.
+# The origin can alse be specified from the command line.
 # To see a list of the command line arguments, run the following.
-# This that solution also support working with N-dimensional points,
-# and the origin can be specified from the command line.
 #   chmod +x closest_points.exs
 #   ./closest_points.exs --help
 # Examples:
@@ -29,7 +29,7 @@ defmodule ClosestPoints do
   def process(pOrigin, pPoints, pResultCount) do
     pPoints
     |> Enum.map(&subtractPoint(&1, pOrigin))
-    |> Enum.map(&distanceFromOrigin/1)
+    |> Enum.map(&distanceSquaredFromOrigin/1)
     |> Enum.zip(pPoints)
     |> Enum.sort(fn {distanceA,_pa}, {distanceB,_pb} -> distanceA <= distanceB end)
     |> Enum.map(fn {_distance, point} -> point end)
@@ -42,7 +42,7 @@ defmodule ClosestPoints do
     |> Enum.map(fn {a, b} -> a - b end)
   end
 
-  def distanceFromOrigin(pPoint) do
+  def distanceSquaredFromOrigin(pPoint) do
     pPoint
     |> Enum.reduce(0, fn value, total -> total + value*value end)
   end
