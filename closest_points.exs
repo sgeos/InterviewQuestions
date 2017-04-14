@@ -6,29 +6,24 @@
 #   number of points to return.
 
 # EXAMPLE:
-#   inputs: points = [(2,1), (0,1), (0,2), (5,5), (0,1), (2,1)], desired = 3
+#   inputs: points = [(2,1), (0,1), (0,2), (5,5), (0,1), (2,1)], desired number of points = 3
 #   outputs: [(0,1), (0,2), (0,1)]
-
-# N dimensional
-# set origin
 
 # NOTES:
 #   The output can be in any order.
 
-#ETODO Fixme
 # A single file solution written in Elixir follows.
 # To see a list of the command line arguments, run the following.
-# Note that fizz and buzz multiples can be specified from the command line.
-#   chmod +x fizz_buzz.exs
-#   ./fizz_buzz.exs --help
+# This that solution also support working with N-dimensional points,
+# and the origin can be specified from the command line.
+#   chmod +x closest_points.exs
+#   ./closest_points.exs --help
 # Examples:
-#   ./fizz_buzz.exs
-#   ./fizz_buzz.exs -s 2 -F Big... -B Scary... -W Monsters!
-#   ./fizz_buzz.exs -n 50 -x 75
-#   ./fizz_buzz.exs -n 50 -x 75 -s 5
-#   ./fizz_buzz.exs -f 2 -b 3
-#   ./fizz_buzz.exs -n 0 -x 300 -s 3 -f 5 -b 7
-#   ./fizz_buzz.exs -n 0 -x 300 -s 11 -f 5 -b 7 -i
+#   ./closest_points.exs
+#   ./closest_points.exs -p [2,1],[0,1],[0,2],[5,5],[0,1],[2,1] -r 3
+#   ./closest_points.exs -o 3,3 -p [2,1],[0,1],[0,2],[5,5],[0,1],[2,1]
+#   ./closest_points.exs -o=-1,1 -p [-1,0],[0,-1],[0,1],[1,0] -r 2 -v
+#   ./closest_points.exs -p [0,0,0,0],[-1,3,3,3],[3,-1,3,3],[3,3,-1,3],[3,3,3,-1] -o 0,1,2,3 -r 2
 
 defmodule ClosestPoints do
   def process(pOrigin, pPoints, pResultCount) do
@@ -132,21 +127,17 @@ defmodule Script do
     IO.puts("The points, origin and desired number of results can be specified.")
     IO.puts("Usage:")
     IO.puts("  closest_points [--origin ORIGIN] [--points POINTS] [--result-count RESULT_COUNT] [--verbose] [--help]")
-    IO.puts("    --origin ORIGIN             : coordinates of origin, default \"0,0\"")
-    IO.puts("    --o ORIGIN                  : coordinates of origin, default \"0,0\"")
-    IO.puts("    --points POINTS             : list of points to use, default \"[0,1],[-1,0]\"")
-    IO.puts("    --p POINTS                  : list of points to use, default \"[0,1],[-1,0]\"")
-    IO.puts("    --result-count RESULT_COUNT : number of closest points to return, default 1")
-    IO.puts("    --r RESULT_COUNT            : number of closest points to return, default 1")
-    IO.puts("    --verbose                   : print verbose output, default false")
-    IO.puts("    -v                          : print verbose output, default false")
-    IO.puts("    --help                      : display this usage summary")
-    IO.puts("    -?                          : display this usage summary")
+    IO.puts("    -o | --origin ORIGIN             : coordinates of origin, default \"0,0\"")
+    IO.puts("    -p | --points POINTS             : list of points to use, default \"[0,1],[-1,0]\"")
+    IO.puts("    -r | --result-count RESULT_COUNT : number of closest points to return, default 1")
+    IO.puts("    -v | --verbose                   : print verbose output, default false")
+    IO.puts("    -? | --help                      : display this usage summary")
     IO.puts("Examples:")
     IO.puts("  closest_points")
-    IO.puts("  closest_points -o 3,3 -p [2,1],[0,1],[0,2],[5,5],[0,1],[2,1]")
     IO.puts("  closest_points -p [2,1],[0,1],[0,2],[5,5],[0,1],[2,1] -r 3")
+    IO.puts("  closest_points -o 3,3 -p [2,1],[0,1],[0,2],[5,5],[0,1],[2,1]")
     IO.puts("  closest_points -o=-1,1 -p [-1,0],[0,-1],[0,1],[1,0] -r 2 -v")
+    IO.puts("  closest_points -p [0,0,0,0],[-1,3,3,3],[3,-1,3,3],[3,3,-1,3],[3,3,3,-1] -o 0,1,2,3 -r 2")
   end
 
   def process(pOptions) do
