@@ -20,6 +20,17 @@
 # cull the list of supported currencies to prevent an infinite recursive search.
 #
 # This attempt kind of works, and it will need to be good enough.
+# If I were to revisit this problem, I would try something like this.
+#
+#  0. Sanity check input.
+#  1. Create NxN sparse matrix with above data points.  Add reverse conversions.
+#  2. Return the final answer if the conversion is in the table.
+#  3. Create a list of unsolved conversions.
+#  3a. For each unsolved conversion:
+#  3b. Attempt to the find solution using only two existing conversions (A -> B -> C).
+#  3c. Remove from list if solved, otherwise save for next pass.
+#  4. Return the final answer if conversion is in the table.
+#  5. Go to 3a.  (There is finite space, so this will terminate given sane data.)
 
 defmodule Script do
   # this should probably be precomputed only once
