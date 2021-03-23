@@ -123,7 +123,15 @@ defmodule Script do
     IO.puts("\n--- Self Conversion ---")
     main(["aud:aud", "cad:cad", "euro:euro", "jpy:jpy", "pond:pond", "sfr:sfr", "usd:usd"])
 
+    IO.puts("\n--- Full Test ---")
+    rates
+    |> currencies
+    |> Enum.map(fn i -> rates |> currencies |> Enum.map(fn j -> {i, j} end) end)
+    |> Enum.reduce([], &Kernel.++/2)
+    |> Enum.each(fn {from, to} -> print_rate(rates, from, to) end)
+
     IO.puts("\n--- Bad Conversion ---")
+    print_rate(rates, :btc, :btc)
     print_rate(rates, :usd, :btc)
     print_rate(rates, :btc, :usd)
   end
