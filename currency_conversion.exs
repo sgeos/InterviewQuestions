@@ -204,6 +204,6 @@ defmodule Script do
   end
 end
 
-# everythign starts here
+# everything starts here
 Script.main(System.argv)
 
