@@ -17,9 +17,10 @@ defmodule Script do
     |> Enum.reduce([],
       fn
         {_, v}, a when 0 == rem(v, 2) -> a
-        {k, _}, a -> a ++ [k]
+        {k, _}, a -> [k] ++ a
       end
     )
+    |> Enum.sort()
   end
 
   # reusable printing function
