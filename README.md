@@ -25,6 +25,54 @@ The files in the **rust** directory require the [Rust][rust-home]
 programming language.
 Instructions for installing Rust can be found [here][rust-install].
 
+Rust examples are located in **rust/src**.
+**main.rs** is boilerplate code that has a few strategies for
+communicating with the library code to build an executable binary.
+**lib.rs** contains library code with FFI and native Rust entry points.
+It parses command line arguments and calls the appropriate question based
+on a subcommand.
+Note that many of the option can also be defined with environment
+variables.
+
+**question.rs** is a module that lists and exposes all of the questions.
+The **question** directory contains the code for each individual
+question.
+Each module has a top level **run()** function that takes parameters
+appropriate for the problem.
+**lib.rs** parses the parameters from the command line before passing them in.
+
+The help subcommand can be used to get information about the subcommands
+and parameters that can be used.
+
+```sh
+cd rust
+
+# list subcommands and general options
+cargo run -- --help
+
+# list options for a particular subcommand
+cargo run hello --help
+```
+
+Defaults are used if nothing is specified.
+
+```sh
+# default command with default arguments
+cargo run
+
+# default arguments
+cargo run hello
+```
+
+Parameters tend to have a short name, long name, and environment variable
+option.
+
+```sh
+cargo run hello -n Rust
+cargo run hello --name $(whoami)
+NAME=environment cargo run hello
+```
+
 ## Elixir
 
 The files in the **elixir** directory require the [Elixir][elixir-home]
@@ -35,6 +83,7 @@ If **env** is located at **/usr/bin/env**, then the **.exs** files
 can be executed.
 
 ```sh
+cd elixir
 chmod +x *.exs
 ./fizz_buzz.exs -s 2 -F Big... -B Scary... -W Monsters!
 ```
