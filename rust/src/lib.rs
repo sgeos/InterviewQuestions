@@ -10,6 +10,7 @@ use std::str::FromStr;
 const APP_NAME: &str = "Interview Questions";
 const APP_VERSION: &str = "0.1";
 
+const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
 const HELLO_DEFAULT_NAME: &str = "World";
 const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
@@ -35,6 +36,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
   let subcommand_matches = matches.subcommand_matches(subcommand_name).unwrap_or(&matches);
 
   match subcommand_name {
+    "digital_root" => {
+      let number = match_value(&subcommand_matches, "number", DIGITAL_ROOT_DEFAULT_NUMBER.parse::<i64>().unwrap());
+      question::digital_root::run(number);
+    },
     "hello" => {
       let name = match_value(&subcommand_matches, "name", HELLO_DEFAULT_NAME.to_string());
       question::hello::run(name);
@@ -54,6 +59,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
     .version(APP_VERSION)
     .author("Brendan Sechter <sgeos@hotmail.com>")
     .about("Interview questions project.")
+    .subcommand(App::new("digital_root")
+      .about("Print recursive sum of digits in a number.")
+      .arg(Arg::new("number")
+        .env("NUMBER")
+        .about("Input number.")
+        .long("number")
+        .short('n')
+        .takes_value(true)
+        .default_value(DIGITAL_ROOT_DEFAULT_NUMBER)
+      )
+    )
     .subcommand(App::new("hello")
       .about("Simple hello world example.")
       .arg(Arg::new("name")
