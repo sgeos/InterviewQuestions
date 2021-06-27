@@ -11,6 +11,7 @@ const APP_NAME: &str = "Interview Questions";
 const APP_VERSION: &str = "0.1";
 
 const HELLO_DEFAULT_NAME: &str = "World";
+const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
 #[no_mangle]
 pub extern fn run(argc: c_int, argv: *const *const c_char) {
@@ -38,6 +39,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
       let name = match_value(&subcommand_matches, "name", HELLO_DEFAULT_NAME.to_string());
       question::hello::run(name);
     },
+    "unique_character" => {
+      let string = match_value(&subcommand_matches, "string", UNIQUE_STRING_DEFAULT_STRING.to_string());
+      question::unique_character::run(&string);
+    },
     _ => question::hello::run(HELLO_DEFAULT_NAME.to_string()),
   }
 
@@ -58,6 +63,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('n')
         .takes_value(true)
         .default_value(HELLO_DEFAULT_NAME)
+      )
+    )
+    .subcommand(App::new("unique_character")
+      .about("String has unique characters or not.")
+      .arg(Arg::new("string")
+        .env("STRING")
+        .about("String to test.")
+        .long("string")
+        .short('s')
+        .takes_value(true)
+        .default_value(UNIQUE_STRING_DEFAULT_STRING)
       )
     )
     .get_matches_from(args)

@@ -52,6 +52,7 @@ cargo run -- --help
 
 # list options for a particular subcommand
 cargo run hello --help
+cargo run unique_character --help
 ```
 
 Defaults are used if nothing is specified.
@@ -62,15 +63,22 @@ cargo run
 
 # default arguments
 cargo run hello
+cargo run unique_character
 ```
 
 Parameters tend to have a short name, long name, and environment variable
 option.
 
 ```sh
+# hello examples
 cargo run hello -n Rust
 cargo run hello --name $(whoami)
 NAME=environment cargo run hello
+
+# unique_character examples
+cargo run unique_character -s 日曜日
+cargo run unique_character --string 忍者
+STRING=$(whoami) cargo run unique_character
 ```
 
 ## Elixir
