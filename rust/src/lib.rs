@@ -12,6 +12,8 @@ const APP_VERSION: &str = "0.1";
 
 const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
 const HELLO_DEFAULT_NAME: &str = "World";
+const NAILS_DEFAULT_HAMMER: &str = "2";
+const NAILS_DEFAULT_NAILS: &str = "1,1,3,3,3,4,5,5,5,5";
 const PRINT_L_DEFAULT_SIZE: &str = "4";
 const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
@@ -44,6 +46,16 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
     "hello" => {
       let name = match_value(&subcommand_matches, "name", HELLO_DEFAULT_NAME.to_string());
       question::hello::run(name);
+    },
+    "nails" => {
+      let hammer = match_value(&subcommand_matches, "hammer", NAILS_DEFAULT_HAMMER.parse::<i64>().unwrap());
+      let mut nails: Vec<i64> =
+        match_value(&subcommand_matches, "nails", NAILS_DEFAULT_NAILS.to_string())
+        .split(',')
+        .map(|s| s.parse::<i64>().unwrap_or(0))
+        .collect();
+      nails.sort();
+      question::nails::run(&nails, hammer);
     },
     "print_l" => {
       let size = match_value(&subcommand_matches, "size", PRINT_L_DEFAULT_SIZE.parse::<i64>().unwrap());
@@ -84,6 +96,25 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('n')
         .takes_value(true)
         .default_value(HELLO_DEFAULT_NAME)
+      )
+    )
+    .subcommand(App::new("nails")
+      .about("Nails of same length after hammering down at most H.")
+      .arg(Arg::new("hammer")
+        .env("HAMMER")
+        .about("Number of nails to hammer down.")
+        .long("hammer")
+        .short('h')
+        .takes_value(true)
+        .default_value(NAILS_DEFAULT_HAMMER)
+      )
+      .arg(Arg::new("nails")
+        .env("NAILS")
+        .about("Comma-separated list of nail lengths.")
+        .long("nails")
+        .short('n')
+        .takes_value(true)
+        .default_value(NAILS_DEFAULT_NAILS)
       )
     )
     .subcommand(App::new("print_l")

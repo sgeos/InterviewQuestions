@@ -4,10 +4,10 @@
 //     pub fn run(size: i64)
 //
 //   that prints out ASCII-art in the shape of the capital letter L,
-//   made up of copies of the capital letter L. The size parameter is an
+//   made up of copies of the capital letter L. The SIZE parameter is an
 //   i64 (between 1 and 100) and represents the expected size of the
-//   ASCII-art (the output should comprise size rows, the last of which
-//   should comprise size letters L).
+//   ASCII-art (the output should comprise SIZE rows, the last of which
+//   should comprise SIZE letters L).
 //
 //   For example, here is the output for size = 4:
 //
@@ -24,7 +24,7 @@
 //     print!("sameple string");
 //     println!("whole line");
 //
-//   you can write to stderr for debugging purposes, e.g.
+//   You can write to stderr for debugging purposes.  For example:
 //
 //     eprint!("debug string");
 //     eprintln!("this is a debug message");
