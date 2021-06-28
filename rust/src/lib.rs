@@ -15,6 +15,8 @@ const HELLO_DEFAULT_NAME: &str = "World";
 const NAILS_DEFAULT_HAMMER: &str = "2";
 const NAILS_DEFAULT_NAILS: &str = "1,1,3,3,3,4,5,5,5,5";
 const PRINT_L_DEFAULT_SIZE: &str = "4";
+const ROME_DEFAULT_FROM: &str = "1,2,3";
+const ROME_DEFAULT_TO: &str = "0,0,0";
 const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
 #[no_mangle]
@@ -60,6 +62,19 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
     "print_l" => {
       let size = match_value(&subcommand_matches, "size", PRINT_L_DEFAULT_SIZE.parse::<i64>().unwrap());
       question::print_l::run(size);
+    },
+    "rome" => {
+      let from: Vec<i64> =
+        match_value(&subcommand_matches, "from", ROME_DEFAULT_FROM.to_string())
+        .split(',')
+        .map(|s| s.parse::<i64>().unwrap_or(0))
+        .collect();
+      let to: Vec<i64> =
+        match_value(&subcommand_matches, "to", ROME_DEFAULT_TO.to_string())
+        .split(',')
+        .map(|s| s.parse::<i64>().unwrap_or(0))
+        .collect();
+      question::rome::run(&from, &to);
     },
     "unique_character" => {
       let string = match_value(&subcommand_matches, "string", UNIQUE_STRING_DEFAULT_STRING.to_string());
@@ -126,6 +141,25 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('s')
         .takes_value(true)
         .default_value(PRINT_L_DEFAULT_SIZE)
+      )
+    )
+    .subcommand(App::new("rome")
+      .about("Find Rome based on the logic that all roads lead to Rome. FROM[N] leads to TO[N].")
+      .arg(Arg::new("from")
+        .env("FROM")
+        .about("Comma-separated list of cities where roads start from.")
+        .long("from")
+        .short('f')
+        .takes_value(true)
+        .default_value(ROME_DEFAULT_FROM)
+      )
+      .arg(Arg::new("to")
+        .env("TO")
+        .about("Comma-separated list of cities where roads lead to.")
+        .long("to")
+        .short('t')
+        .takes_value(true)
+        .default_value(ROME_DEFAULT_TO)
       )
     )
     .subcommand(App::new("unique_character")
