@@ -67,3 +67,29 @@ fn space_optimized(string: &str) -> bool {
   return true;
 }
 
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn run_ok() {
+    run("test");
+  }
+
+  #[test]
+  fn time_optimized_returns_expected() {
+    assert_eq!(false, time_optimized("test"));
+    assert_eq!(true, time_optimized("true"));
+    assert_eq!(false, time_optimized("日曜日"));
+    assert_eq!(true, time_optimized("忍者"));
+  }
+
+  #[test]
+  fn space_optimized_returns_expected() {
+    assert_eq!(false, space_optimized("test"));
+    assert_eq!(true, space_optimized("true"));
+    assert_eq!(false, space_optimized("日曜日"));
+    assert_eq!(true, space_optimized("忍者"));
+  }
+}
+

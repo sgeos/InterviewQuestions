@@ -103,4 +103,35 @@ fn match_value<T: FromStr>(matches: &clap::ArgMatches, key: &str, default: T) ->
     .parse::<T>()
     .unwrap_or(default)
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::ffi::CString;
+
+  #[test]
+  fn run_ok() {
+    let args: Vec<CString> =
+      vec![CString::new("help").expect("CString::new failed")];
+    let c_args: Vec<*const c_char> = args
+      .iter()
+      .map(|a| a.as_ptr())
+      .collect();
+    let argc: c_int = args.len() as c_int;
+    let argv: *const *const c_char = c_args.as_ptr();
+
+    run(argc, argv);
+  }
+
+  #[test]
+  fn rlib_run_ok() {
+    let args: Vec<&str> = vec!["help"];
+
+    let is_ok = match rlib_run(args) {
+      Err(_) => false,
+      _ => true,
+    };
+    assert!(is_ok);
+  }
+}
  

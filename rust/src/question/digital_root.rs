@@ -38,6 +38,11 @@ mod tests {
   use super::*;
     
   #[test]
+  fn run_ok() {
+    run(0);
+  }
+
+  #[test]
   fn returns_expected() {
     assert_eq!(digital_root(2), 2);
     assert_eq!(digital_root(16), 7);
