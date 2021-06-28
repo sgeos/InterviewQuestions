@@ -1,3 +1,10 @@
+// USAGE EXAMPLES:
+//
+//   cargo run nails
+//   cargo run nails -n 2,3,3,4 -h 0
+//   cargo run nails --nails 1,2,3,4,5 -h 5
+//   NAILS=0,0,0,0,0,0 HAMMER=3 cargo run nails
+//
 // PROBLEM:
 //
 //   There are QUANTITY nails hammered into the same block of wood. Each

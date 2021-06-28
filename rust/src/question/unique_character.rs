@@ -1,9 +1,16 @@
-// Cracking the Coding Interview, 6th Edition, Page 90
-// Interview Questions 1.1
+// USAGE EXAMPLES:
+//
+//   cargo run unique_character
+//   cargo run unique_character -s Rust
+//   cargo run unique_character --string 日曜日
+//   STRING=$(whoami) cargo run unique_character
 //
 // PROBLEM: Is Unique
 //   Implement an algorithm to determine if a string has all unique
 //   characters.  What if you cannot use additional data structures?
+//
+// Cracking the Coding Interview, 6th Edition, Page 90
+// Interview Questions 1.1
 
 use std::collections::HashMap;
 

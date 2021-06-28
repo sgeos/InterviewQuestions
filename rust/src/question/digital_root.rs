@@ -1,5 +1,9 @@
-// Code Wars, 6th kyu
-//   https://www.codewars.com/kata/541c8630095125aba6000c00/train/rust
+// USAGE EXAMPLES:
+//
+//   cargo run digital_root
+//   cargo run digital_root -n 2
+//   cargo run digital_root --number 942
+//   NUMBER=132189 cargo run digital_root
 //
 // PROBLEM: Digital Root
 //   Digital root is the recursive sum of all the digits in a number.
@@ -15,6 +19,9 @@
 //   132189  -->  1 + 3 + 2 + 1 + 8 + 9 = 24  -->  2 + 4 = 6
 //   493193  -->  4 + 9 + 3 + 1 + 9 + 3 = 29  -->  2 + 9 = 11
 //                                            -->  1 + 1 = 2
+//
+// Code Wars, 6th kyu
+//   https://www.codewars.com/kata/541c8630095125aba6000c00/train/rust
 
 pub fn run(n: i64) {
   println!("{}", digital_root(n))

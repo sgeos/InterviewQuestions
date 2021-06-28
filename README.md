@@ -43,6 +43,7 @@ appropriate for the problem.
 
 The help subcommand can be used to get information about the subcommands
 and parameters that can be used.
+Individual files in the **questions** directory have usage examples.
 
 ```sh
 cd rust

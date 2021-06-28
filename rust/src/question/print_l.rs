@@ -1,3 +1,10 @@
+// USAGE EXAMPLES:
+//
+//   cargo run print_l
+//   cargo run print_l -s 3
+//   cargo run print_l --size 1
+//   SIZE=6 cargo run print_l
+//
 // PROBLEM:
 //   Write a function:
 //
