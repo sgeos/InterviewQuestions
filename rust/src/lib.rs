@@ -12,6 +12,7 @@ const APP_VERSION: &str = "0.1";
 
 const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
 const HELLO_DEFAULT_NAME: &str = "World";
+const PRINT_L_DEFAULT_SIZE: &str = "4";
 const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
 #[no_mangle]
@@ -43,6 +44,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
     "hello" => {
       let name = match_value(&subcommand_matches, "name", HELLO_DEFAULT_NAME.to_string());
       question::hello::run(name);
+    },
+    "print_l" => {
+      let size = match_value(&subcommand_matches, "size", PRINT_L_DEFAULT_SIZE.parse::<i64>().unwrap());
+      question::print_l::run(size);
     },
     "unique_character" => {
       let string = match_value(&subcommand_matches, "string", UNIQUE_STRING_DEFAULT_STRING.to_string());
@@ -79,6 +84,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('n')
         .takes_value(true)
         .default_value(HELLO_DEFAULT_NAME)
+      )
+    )
+    .subcommand(App::new("print_l")
+      .about("Print an ASCII-art L.")
+      .arg(Arg::new("size")
+        .env("SIZE")
+        .about("Size of L.")
+        .long("size")
+        .short('s')
+        .takes_value(true)
+        .default_value(PRINT_L_DEFAULT_SIZE)
       )
     )
     .subcommand(App::new("unique_character")
