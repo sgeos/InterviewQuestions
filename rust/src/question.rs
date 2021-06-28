@@ -1,3 +1,4 @@
+pub mod digit_1;
 pub mod digital_root;
 pub mod hello;
 pub mod nails;
