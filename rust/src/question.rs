@@ -5,5 +5,6 @@ pub mod hello;
 pub mod nails;
 pub mod print_l;
 pub mod rome;
+pub mod rotate;
 pub mod unique_character;
 

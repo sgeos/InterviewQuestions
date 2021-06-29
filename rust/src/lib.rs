@@ -19,6 +19,9 @@ const NAILS_DEFAULT_NAILS: &str = "1,1,3,3,3,4,5,5,5,5";
 const PRINT_L_DEFAULT_SIZE: &str = "4";
 const ROME_DEFAULT_FROM: &str = "1,2,3";
 const ROME_DEFAULT_TO: &str = "0,0,0";
+const ROTATE_DEFAULT_DATA: &str = "01234F.#.5E.#.6D.##7CBA98";
+const ROTATE_DEFAULT_ROTATE: &str = "1";
+const ROTATE_DEFAULT_SIZE: &str = "-1";
 const UNIQUE_STRING_DEFAULT_STRING: &str = "test";
 
 #[no_mangle]
@@ -85,6 +88,12 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
         .map(|s| s.parse::<i64>().unwrap_or(0))
         .collect();
       question::rome::run(&from, &to);
+    },
+    "rotate" => {
+      let data = match_value(&subcommand_matches, "data", ROTATE_DEFAULT_DATA.to_string());
+      let rotate = match_value(&subcommand_matches, "rotate", ROTATE_DEFAULT_ROTATE.parse::<i64>().unwrap());
+      let size = match_value(&subcommand_matches, "size", ROTATE_DEFAULT_SIZE.parse::<i64>().unwrap());
+      question::rotate::run(data, size, rotate);
     },
     "unique_character" => {
       let string = match_value(&subcommand_matches, "string", UNIQUE_STRING_DEFAULT_STRING.to_string());
@@ -192,6 +201,33 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('t')
         .takes_value(true)
         .default_value(ROME_DEFAULT_TO)
+      )
+    )
+    .subcommand(App::new("rotate")
+      .about("Rotate square string-image in increments of 90 degrees..")
+      .arg(Arg::new("data")
+        .env("DATA")
+        .about("Square string-image data.")
+        .long("data")
+        .short('d')
+        .takes_value(true)
+        .default_value(ROTATE_DEFAULT_DATA)
+      )
+      .arg(Arg::new("rotate")
+        .env("ROTATE")
+        .about("Number of times to rotate clockwise.  Negative values can be used to rotate counter-clockwise.")
+        .long("rotate")
+        .short('r')
+        .takes_value(true)
+        .default_value(ROTATE_DEFAULT_ROTATE)
+      )
+      .arg(Arg::new("size")
+        .env("SIZE")
+        .about("Length of side of square.  Use negative value to autocalculate by taking the square root of the string-image data length.")
+        .long("size")
+        .short('s')
+        .takes_value(true)
+        .default_value(ROTATE_DEFAULT_SIZE)
       )
     )
     .subcommand(App::new("unique_character")
