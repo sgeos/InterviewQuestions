@@ -12,6 +12,7 @@ const APP_VERSION: &str = "0.1";
 
 const DIGIT_1_DEFAULT_NUMBER: &str = "13";
 const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
+const DUPLICATE_ENCODE_DEFAULT_STRING: &str = "Success";
 const HELLO_DEFAULT_NAME: &str = "World";
 const NAILS_DEFAULT_HAMMER: &str = "2";
 const NAILS_DEFAULT_NAILS: &str = "1,1,3,3,3,4,5,5,5,5";
@@ -49,6 +50,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
     "digital_root" => {
       let number = match_value(&subcommand_matches, "number", DIGITAL_ROOT_DEFAULT_NUMBER.parse::<i64>().unwrap());
       question::digital_root::run(number);
+    },
+    "duplicate_encode" => {
+      let string = match_value(&subcommand_matches, "string", DUPLICATE_ENCODE_DEFAULT_STRING.to_string());
+      question::duplicate_encode::run(string);
     },
     "hello" => {
       let name = match_value(&subcommand_matches, "name", HELLO_DEFAULT_NAME.to_string());
@@ -116,6 +121,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('n')
         .takes_value(true)
         .default_value(DIGITAL_ROOT_DEFAULT_NUMBER)
+      )
+    )
+    .subcommand(App::new("duplicate_encode")
+      .about("Enode string using '(' for unique characters and ')' for duplicates..")
+      .arg(Arg::new("string")
+        .env("STRING")
+        .about("Input string.")
+        .long("string")
+        .short('s')
+        .takes_value(true)
+        .default_value(DUPLICATE_ENCODE_DEFAULT_STRING)
       )
     )
     .subcommand(App::new("hello")
