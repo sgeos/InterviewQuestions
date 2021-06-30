@@ -10,6 +10,7 @@ use std::str::FromStr;
 const APP_NAME: &str = "Interview Questions";
 const APP_VERSION: &str = "0.1";
 
+const COUNT_DUPLICATES_DEFAULT_STRING: &str = "aabBcde";
 const DIGIT_1_DEFAULT_NUMBER: &str = "13";
 const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
 const DUPLICATE_ENCODE_DEFAULT_STRING: &str = "Success";
@@ -46,6 +47,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
   let subcommand_matches = matches.subcommand_matches(subcommand_name).unwrap_or(&matches);
 
   match subcommand_name {
+    "count_duplicates" => {
+      let string = match_value(&subcommand_matches, "string", COUNT_DUPLICATES_DEFAULT_STRING.to_string());
+      question::count_duplicates::run(string);
+    },
     "digit_1" => {
       let number = match_value(&subcommand_matches, "number", DIGIT_1_DEFAULT_NUMBER.parse::<i64>().unwrap());
       question::digit_1::run(number);
@@ -110,6 +115,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
     .version(APP_VERSION)
     .author("Brendan Sechter <sgeos@hotmail.com>")
     .about("Interview questions project.")
+    .subcommand(App::new("count_duplicates")
+      .about("Print number of duplicated characters in string.")
+      .arg(Arg::new("string")
+        .env("STRING")
+        .about("Input string.")
+        .long("string")
+        .short('s')
+        .takes_value(true)
+        .default_value(COUNT_DUPLICATES_DEFAULT_STRING)
+      )
+    )
     .subcommand(App::new("digit_1")
       .about("Print number of 1 digits in numbers from 0 to input value.")
       .arg(Arg::new("number")
@@ -133,7 +149,7 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
       )
     )
     .subcommand(App::new("duplicate_encode")
-      .about("Enode string using '(' for unique characters and ')' for duplicates..")
+      .about("Enode string using '(' for unique characters and ')' for duplicates.")
       .arg(Arg::new("string")
         .env("STRING")
         .about("Input string.")
@@ -204,7 +220,7 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
       )
     )
     .subcommand(App::new("rotate")
-      .about("Rotate square string-image in increments of 90 degrees..")
+      .about("Rotate square string-image in increments of 90 degrees.")
       .arg(Arg::new("data")
         .env("DATA")
         .about("Square string-image data.")

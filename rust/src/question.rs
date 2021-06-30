@@ -1,3 +1,4 @@
+pub mod count_duplicates;
 pub mod digit_1;
 pub mod digital_root;
 pub mod duplicate_encode;
