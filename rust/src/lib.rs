@@ -11,6 +11,7 @@ const APP_NAME: &str = "Interview Questions";
 const APP_VERSION: &str = "0.1";
 
 const COUNT_DUPLICATES_DEFAULT_STRING: &str = "aabBcde";
+const CUBE_PILE_DEFAULT_CUBES: &str = "36";
 const DIGIT_1_DEFAULT_NUMBER: &str = "13";
 const DIGITAL_ROOT_DEFAULT_NUMBER: &str = "123";
 const DUPLICATE_ENCODE_DEFAULT_STRING: &str = "Success";
@@ -50,6 +51,10 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
     "count_duplicates" => {
       let string = match_value(&subcommand_matches, "string", COUNT_DUPLICATES_DEFAULT_STRING.to_string());
       question::count_duplicates::run(string);
+    },
+    "cube_pile" => {
+      let cubes = match_value(&subcommand_matches, "cubes", CUBE_PILE_DEFAULT_CUBES.parse::<u64>().unwrap());
+      question::cube_pile::run(cubes);
     },
     "digit_1" => {
       let number = match_value(&subcommand_matches, "number", DIGIT_1_DEFAULT_NUMBER.parse::<i64>().unwrap());
@@ -124,6 +129,17 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
         .short('s')
         .takes_value(true)
         .default_value(COUNT_DUPLICATES_DEFAULT_STRING)
+      )
+    )
+    .subcommand(App::new("cube_pile")
+      .about("Find N for a number of cubes such that the total is the sum of all terms from 1^3 + 2^3 + 3^3 + ... + (N - 1)^3 + N^3.  Return -1 if there is no whole number solution.")
+      .arg(Arg::new("cubes")
+        .env("CUBES")
+        .about("Total number of cubes.")
+        .long("cubes")
+        .short('c')
+        .takes_value(true)
+        .default_value(CUBE_PILE_DEFAULT_CUBES)
       )
     )
     .subcommand(App::new("digit_1")
