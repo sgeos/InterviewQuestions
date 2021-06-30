@@ -79,7 +79,33 @@ fn print_data(data: &Vec<char>, window_size: usize) {
     // O(1)
     print!("{}", c);
   }
+  // O(1)
   println!();
+}
+
+// time complexity, O(N), loop over data
+// space complexity, O(N), create map of character indices
+// This works fine, but Vec<char> is better than string for
+// blitting operations.  See _blit_string() below.
+fn _print_data_string(
+  data: String,
+  window_size: usize
+) {
+  // O(N), loop over data
+  let indices = data
+    .char_indices()
+    .map(|(i,_)| i)
+    .chain([data.len()])
+    .collect::<Vec<_>>(); 
+  // O(sqrt(N)), loop in y direction of data
+  for i in 0..window_size {
+    // O(1)
+    let start = indices[i * window_size];
+    // O(1)
+    let end   = indices[(i + 1) * window_size];
+    // O(1)
+    println!("{}", &data[start..end]);
+  }
 }
 
 // time complexity, O(1), vector operation
@@ -100,6 +126,30 @@ fn blit(
 ) {
   // O(1), vector operation
   data[y * width + x] = pixel;
+}
+
+// time complexity, O(N), loop over data
+// space complexity, O(1), string copy, but not all at once
+// String uses less memory than Vec<char>.
+// However, String blit is O(N) where Vec<char> blit is O(1).
+// Therefore, Vec<char> is the correct data type for heavy blitting.
+// To convert from Vec<char> to String, use:
+//   vector.iter().collect::<String>();
+fn _blit_string(
+  data: &mut String,
+  width: usize,
+  x: usize,
+  y: usize,
+  pixel: char
+) {
+  // O(N), loop over data
+  let range = data
+    .char_indices()
+    .nth(y * width + x)
+    .map(|(i, c)| i..i + c.len_utf8())
+    .unwrap();
+  // O(N), string copy
+  data.replace_range(range, &pixel.to_string());
 }
 
 // time complexity, O(1), vector operation
