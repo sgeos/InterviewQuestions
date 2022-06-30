@@ -1,3 +1,4 @@
+pub mod ascii_encoder;
 pub mod count_duplicates;
 pub mod cube_pile;
 pub mod digit_1;

@@ -10,6 +10,10 @@ use std::str::FromStr;
 const APP_NAME: &str = "Interview Questions";
 const APP_VERSION: &str = "0.1";
 
+const ASCII_DECODER_DEFAULT_MESSAGE: &str = "BzEJR, 7fqvs!";
+const ASCII_DECODER_DEFAULT_PASSWORD: &str = "Secret";
+const ASCII_ENCODER_DEFAULT_MESSAGE: &str = "Hello, world!";
+const ASCII_ENCODER_DEFAULT_PASSWORD: &str = "Secret";
 const COUNT_DUPLICATES_DEFAULT_STRING: &str = "aabBcde";
 const CUBE_PILE_DEFAULT_CUBES: &str = "36";
 const DIGIT_1_DEFAULT_NUMBER: &str = "13";
@@ -48,6 +52,16 @@ pub fn rlib_run(args: Vec<&str>) -> Result<(), Box<dyn Error>> {
   let subcommand_matches = matches.subcommand_matches(subcommand_name).unwrap_or(&matches);
 
   match subcommand_name {
+    "ascii_decoder" => {
+      let message = match_value(&subcommand_matches, "message", ASCII_DECODER_DEFAULT_MESSAGE.to_string());
+      let password = match_value(&subcommand_matches, "password", ASCII_DECODER_DEFAULT_PASSWORD.to_string());
+      question::ascii_encoder::run_decoder(password, message);
+    },
+    "ascii_encoder" => {
+      let message = match_value(&subcommand_matches, "message", ASCII_ENCODER_DEFAULT_MESSAGE.to_string());
+      let password = match_value(&subcommand_matches, "password", ASCII_ENCODER_DEFAULT_PASSWORD.to_string());
+      question::ascii_encoder::run_encoder(password, message);
+    },
     "count_duplicates" => {
       let string = match_value(&subcommand_matches, "string", COUNT_DUPLICATES_DEFAULT_STRING.to_string());
       question::count_duplicates::run(string);
@@ -120,6 +134,44 @@ fn parse_args(args: Vec<&str>) -> clap::ArgMatches {
     .version(APP_VERSION)
     .author("Brendan Sechter <sgeos@hotmail.com>")
     .about("Interview questions project.")
+    .subcommand(App::new("ascii_decoder")
+      .about("Decodes a message with a password.")
+      .arg(Arg::new("message")
+        .env("MESSAGE")
+        .about("Message to decode.")
+        .long("message")
+        .short('m')
+        .takes_value(true)
+        .default_value(ASCII_DECODER_DEFAULT_MESSAGE)
+      )
+      .arg(Arg::new("password")
+        .env("PASSWORD")
+        .about("Password for decoding.")
+        .long("password")
+        .short('p')
+        .takes_value(true)
+        .default_value(ASCII_DECODER_DEFAULT_PASSWORD)
+      )
+    )
+    .subcommand(App::new("ascii_encoder")
+      .about("Encodes a message with a password.")
+      .arg(Arg::new("message")
+        .env("MESSAGE")
+        .about("Message to encode.")
+        .long("message")
+        .short('m')
+        .takes_value(true)
+        .default_value(ASCII_ENCODER_DEFAULT_MESSAGE)
+      )
+      .arg(Arg::new("password")
+        .env("PASSWORD")
+        .about("Password for encoding.")
+        .long("password")
+        .short('p')
+        .takes_value(true)
+        .default_value(ASCII_ENCODER_DEFAULT_PASSWORD)
+      )
+    )
     .subcommand(App::new("count_duplicates")
       .about("Print number of duplicated characters in string.")
       .arg(Arg::new("string")
